@@ -1,0 +1,858 @@
+# Copyright (C) 2026 Codixr
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Data Shifter 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/data-shifter\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-16T09:16:25+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: data-shifter\n"
+
+#. Plugin Name of the plugin
+#: data-shifter.php
+#: includes/class-data-shifter-admin.php:43
+#: includes/class-data-shifter-admin.php:44
+msgid "Data Shifter"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: data-shifter.php
+msgid "https://codixr.com"
+msgstr ""
+
+#. Description of the plugin
+#: data-shifter.php
+msgid "Export and import WordPress content, including posts, pages, custom post types, custom fields, taxonomies, comments and media, in JSON, ZIP, CSV or XML."
+msgstr ""
+
+#. Author of the plugin
+#: data-shifter.php
+msgid "Codixr"
+msgstr ""
+
+#. translators: %s: required PHP version
+#: data-shifter.php:34
+#, php-format
+msgid "Data Shifter requires PHP %s or higher. Please update your PHP version."
+msgstr ""
+
+#. translators: %s: required WordPress version
+#: data-shifter.php:55
+#, php-format
+msgid "Data Shifter requires WordPress %s or higher. Please update WordPress."
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:54
+#: includes/class-data-shifter-admin.php:55
+#: views/export-page.php:40
+#: views/partials/header.php:17
+msgid "Export"
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:63
+#: includes/class-data-shifter-admin.php:64
+#: views/partials/header.php:22
+msgid "Import"
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:104
+msgid "Export completed successfully."
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:105
+msgid "An error occurred during export."
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:106
+msgid "Import completed successfully."
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:107
+msgid "An error occurred during import."
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:108
+msgid "Are you sure you want to run this import? This action cannot be undone."
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:109
+msgid "Processing…"
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:110
+msgid "Downloading…"
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:111
+msgid "Uploading…"
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:124
+#: includes/class-data-shifter-admin.php:136
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#. translators: 1: Codixr website link, 2: support email link
+#: includes/class-data-shifter-admin.php:154
+#, php-format
+msgid "Data Shifter is built by %1$s, a software agency. Need help? Email %2$s."
+msgstr ""
+
+#: includes/class-data-shifter-admin.php:170
+msgid "Open Data Shifter"
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:67
+#: includes/class-data-shifter-ajax.php:491
+msgid "Security check failed."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:70
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:309
+#: includes/class-data-shifter-ajax.php:358
+msgid "Invalid post type."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:459
+msgid "Failed to write export file."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:494
+msgid "Permission denied."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:499
+msgid "No file specified."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:504
+msgid "Invalid file path or file not found."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:556
+#: includes/class-data-shifter-ajax.php:566
+msgid "No file was uploaded."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:563
+msgid "File exceeds server upload size limit."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:564
+msgid "File exceeds form upload size limit."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:565
+msgid "File was only partially uploaded."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:567
+msgid "Server missing temporary folder."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:568
+msgid "Failed to write file to disk."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:569
+msgid "A PHP extension stopped the upload."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:571
+msgid "Unknown upload error."
+msgstr ""
+
+#. translators: %s: comma-separated list of file extensions
+#: includes/class-data-shifter-ajax.php:584
+#, php-format
+msgid "Invalid file type. Allowed types: %s"
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:597
+msgid "Failed to move uploaded file."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:649
+msgid "Invalid chunk upload parameters."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:655
+msgid "Invalid file extension."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:659
+msgid "Chunk upload failed on server."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:670
+msgid "Failed to read uploaded chunk."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:676
+msgid "Failed to write chunk to temporary storage."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:704
+msgid "Failed to assemble uploaded chunks."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:759
+#: includes/class-data-shifter-ajax.php:903
+msgid "Missing file or format."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:764
+msgid "Import file not found or path invalid."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:832
+#: includes/class-data-shifter-ajax.php:869
+msgid "Missing session ID."
+msgstr ""
+
+#: includes/class-data-shifter-ajax.php:908
+#: includes/class-data-shifter-importer.php:154
+msgid "Import file not found."
+msgstr ""
+
+#. translators: %s: post type name
+#: includes/class-data-shifter-exporter.php:115
+#, php-format
+msgid "Post type \"%s\" does not exist."
+msgstr ""
+
+#: includes/class-data-shifter-exporter.php:282
+msgid "ZipArchive is not enabled on this server PHP environment."
+msgstr ""
+
+#: includes/class-data-shifter-exporter.php:288
+msgid "Could not create ZIP package file on disk."
+msgstr ""
+
+#: includes/class-data-shifter-exporter.php:357
+msgid "Cannot open file for writing."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:171
+msgid "Unsupported file format."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:182
+msgid "ZipArchive is not enabled on this server."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:194
+msgid "Could not open ZIP package."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:204
+msgid "The ZIP package does not contain data.json."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:212
+msgid "The data.json inside the ZIP package is invalid."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:240
+msgid "The JSON file is empty."
+msgstr ""
+
+#. translators: %s: JSON parser error message
+#: includes/class-data-shifter-importer.php:256
+#, php-format
+msgid "Invalid JSON format: %s"
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:294
+msgid "Cannot open CSV file."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:306
+msgid "CSV header row is missing or invalid."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:413
+msgid "SimpleXML PHP extension is required to import XML files."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:418
+msgid "Failed to parse XML file."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:680
+msgid "Import session expired or not found. Please upload again."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:688
+msgid "Corrupted session data."
+msgstr ""
+
+#. translators: 1: item number, 2: item title, 3: error message
+#: includes/class-data-shifter-importer.php:728
+#, php-format
+msgid "Item #%1$d (%2$s): %3$s"
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:785
+msgid "Session file not found."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:823
+msgid "Could not finalize session."
+msgstr ""
+
+#: includes/class-data-shifter-importer.php:913
+msgid "Item has neither title nor content."
+msgstr ""
+
+#: includes/class-data-shifter-media.php:53
+msgid "Invalid URL provided for media import."
+msgstr ""
+
+#. translators: %s: host name
+#: includes/class-data-shifter-media.php:102
+#, php-format
+msgid "Local host %s cannot be reached from this server without bundled image data."
+msgstr ""
+
+#. translators: 1: URL, 2: error message
+#: includes/class-data-shifter-media.php:124
+#, php-format
+msgid "Failed to download media from %1$s: %2$s"
+msgstr ""
+
+#. translators: 1: URL, 2: HTTP status code
+#: includes/class-data-shifter-media.php:137
+#, php-format
+msgid "HTTP error %2$d when downloading %1$s."
+msgstr ""
+
+#: includes/class-data-shifter-media.php:146
+msgid "Downloaded file is empty."
+msgstr ""
+
+#: includes/class-data-shifter-media.php:217
+msgid "Could not determine file type."
+msgstr ""
+
+#: views/export-page.php:21
+msgid "Export steps"
+msgstr ""
+
+#: views/export-page.php:24
+msgid "Select Data"
+msgstr ""
+
+#: views/export-page.php:28
+msgid "Filter"
+msgstr ""
+
+#: views/export-page.php:32
+msgid "Fields"
+msgstr ""
+
+#: views/export-page.php:36
+msgid "Options"
+msgstr ""
+
+#: views/export-page.php:47
+msgid "Select Data Type"
+msgstr ""
+
+#: views/export-page.php:48
+msgid "Choose the type of content you want to export."
+msgstr ""
+
+#: views/export-page.php:53
+msgid "Loading post types…"
+msgstr ""
+
+#: views/export-page.php:59
+msgid "Next: Filters"
+msgstr ""
+
+#: views/export-page.php:67
+msgid "Filter Your Data"
+msgstr ""
+
+#: views/export-page.php:68
+msgid "Optionally narrow down the data to export. All filters are optional."
+msgstr ""
+
+#: views/export-page.php:74
+msgid "Post Status"
+msgstr ""
+
+#: views/export-page.php:76
+msgid "All Statuses"
+msgstr ""
+
+#: views/export-page.php:77
+msgid "Published"
+msgstr ""
+
+#: views/export-page.php:78
+msgid "Draft"
+msgstr ""
+
+#: views/export-page.php:79
+msgid "Pending Review"
+msgstr ""
+
+#: views/export-page.php:80
+msgid "Private"
+msgstr ""
+
+#: views/export-page.php:81
+msgid "Trash"
+msgstr ""
+
+#: views/export-page.php:87
+msgid "Date Range"
+msgstr ""
+
+#: views/export-page.php:89
+msgid "From"
+msgstr ""
+
+#: views/export-page.php:90
+msgid "to"
+msgstr ""
+
+#: views/export-page.php:91
+msgid "To"
+msgstr ""
+
+#: views/export-page.php:97
+msgid "Taxonomy Filter"
+msgstr ""
+
+#: views/export-page.php:99
+msgid "Select a taxonomy…"
+msgstr ""
+
+#: views/export-page.php:102
+msgid "Select terms to include:"
+msgstr ""
+
+#: views/export-page.php:109
+#: views/export-page.php:192
+msgid "Author"
+msgstr ""
+
+#: views/export-page.php:113
+msgid "All Authors"
+msgstr ""
+
+#: views/export-page.php:124
+msgid "Specific Post IDs"
+msgstr ""
+
+#: views/export-page.php:125
+msgid "e.g. 1, 5, 23, 42"
+msgstr ""
+
+#: views/export-page.php:126
+msgid "Comma-separated list of post IDs."
+msgstr ""
+
+#: views/export-page.php:131
+msgid "Search Keyword"
+msgstr ""
+
+#: views/export-page.php:132
+msgid "Search within post title and content…"
+msgstr ""
+
+#: views/export-page.php:138
+#: views/export-page.php:246
+#: views/export-page.php:321
+msgid "Back"
+msgstr ""
+
+#: views/export-page.php:142
+msgid "Skip Filters"
+msgstr ""
+
+#: views/export-page.php:145
+msgid "Apply Filters & Continue"
+msgstr ""
+
+#: views/export-page.php:154
+msgid "Select Fields"
+msgstr ""
+
+#: views/export-page.php:155
+msgid "Choose which fields to include in your export."
+msgstr ""
+
+#: views/export-page.php:158
+msgid "Select All"
+msgstr ""
+
+#: views/export-page.php:159
+msgid "Deselect All"
+msgstr ""
+
+#: views/export-page.php:164
+msgid "Standard Fields"
+msgstr ""
+
+#: views/export-page.php:168
+#: views/import-page.php:72
+msgid "Title"
+msgstr ""
+
+#: views/export-page.php:172
+msgid "Content"
+msgstr ""
+
+#: views/export-page.php:176
+msgid "Excerpt"
+msgstr ""
+
+#: views/export-page.php:180
+#: views/import-page.php:73
+msgid "Status"
+msgstr ""
+
+#: views/export-page.php:184
+#: views/import-page.php:74
+msgid "Date"
+msgstr ""
+
+#: views/export-page.php:188
+msgid "Slug"
+msgstr ""
+
+#: views/export-page.php:199
+msgid "Custom Fields"
+msgstr ""
+
+#: views/export-page.php:203
+msgid "Loading custom fields…"
+msgstr ""
+
+#: views/export-page.php:210
+msgid "Internal Fields (prefixed with _)"
+msgstr ""
+
+#: views/export-page.php:219
+msgid "Additional Data"
+msgstr ""
+
+#: views/export-page.php:224
+msgid "Include Taxonomies"
+msgstr ""
+
+#: views/export-page.php:229
+msgid "Include Featured Image"
+msgstr ""
+
+#: views/export-page.php:234
+msgid "Include Media Gallery & Custom Field Images"
+msgstr ""
+
+#: views/export-page.php:239
+msgid "Include Comments"
+msgstr ""
+
+#: views/export-page.php:249
+msgid "Next: Options"
+msgstr ""
+
+#: views/export-page.php:257
+msgid "Export Options"
+msgstr ""
+
+#: views/export-page.php:258
+msgid "Choose your export format and additional options."
+msgstr ""
+
+#: views/export-page.php:261
+msgid "Export Format"
+msgstr ""
+
+#: views/export-page.php:266
+msgid "JSON"
+msgstr ""
+
+#: views/export-page.php:267
+msgid "Recommended"
+msgstr ""
+
+#: views/export-page.php:268
+msgid "Best for complete data transfer between WordPress sites. Preserves all data types and relationships."
+msgstr ""
+
+#: views/export-page.php:273
+msgid "ZIP Package"
+msgstr ""
+
+#: views/export-page.php:274
+msgid "With Media"
+msgstr ""
+
+#: views/export-page.php:275
+msgid "Packages data.json + all image files into a ZIP archive. Highly recommended for media-heavy sites."
+msgstr ""
+
+#: views/export-page.php:280
+msgid "CSV"
+msgstr ""
+
+#: views/export-page.php:282
+msgid "Best for opening in Excel or Google Sheets. Flat data format."
+msgstr ""
+
+#: views/export-page.php:287
+msgid "XML"
+msgstr ""
+
+#: views/export-page.php:289
+msgid "Standard XML format. Good for compatibility with other tools."
+msgstr ""
+
+#: views/export-page.php:296
+msgid "Download and bundle media files with export"
+msgstr ""
+
+#: views/export-page.php:297
+msgid "Only available for JSON format. Media files will be included in the download."
+msgstr ""
+
+#: views/export-page.php:303
+msgid "Export Preview"
+msgstr ""
+
+#: views/export-page.php:313
+msgid "Preview Export"
+msgstr ""
+
+#: views/export-page.php:316
+msgid "Run Export"
+msgstr ""
+
+#: views/export-page.php:330
+msgid "Export complete"
+msgstr ""
+
+#: views/export-page.php:338
+msgid "Total Items:"
+msgstr ""
+
+#: views/export-page.php:342
+#: views/import-page.php:57
+msgid "Format:"
+msgstr ""
+
+#: views/export-page.php:346
+msgid "Filename:"
+msgstr ""
+
+#: views/export-page.php:351
+msgid "Download Export File"
+msgstr ""
+
+#: views/export-page.php:354
+msgid "Export Another"
+msgstr ""
+
+#: views/import-page.php:26
+msgid "Drag and drop your export file here"
+msgstr ""
+
+#: views/import-page.php:27
+msgid "or"
+msgstr ""
+
+#: views/import-page.php:29
+msgid "Choose File"
+msgstr ""
+
+#: views/import-page.php:31
+msgid "Choose an import file"
+msgstr ""
+
+#: views/import-page.php:35
+msgid "Supported formats: JSON, ZIP package, CSV and XML. Large files are uploaded in chunks, so the server upload limit does not apply."
+msgstr ""
+
+#: views/import-page.php:42
+msgid "Uploading File..."
+msgstr ""
+
+#: views/import-page.php:46
+msgid "Uploading in chunks (no size limit)..."
+msgstr ""
+
+#: views/import-page.php:54
+msgid "Import Preview & Options"
+msgstr ""
+
+#: views/import-page.php:60
+msgid "Detected Items:"
+msgstr ""
+
+#: views/import-page.php:67
+msgid "Data Preview (First 10 Items)"
+msgstr ""
+
+#: views/import-page.php:71
+msgid "#"
+msgstr ""
+
+#: views/import-page.php:75
+msgid "Excerpt / Summary"
+msgstr ""
+
+#: views/import-page.php:76
+msgid "Image"
+msgstr ""
+
+#: views/import-page.php:87
+msgid "Import Configuration"
+msgstr ""
+
+#: views/import-page.php:92
+msgid "Import As Post Type"
+msgstr ""
+
+#: views/import-page.php:95
+msgid "Posts (post)"
+msgstr ""
+
+#: views/import-page.php:96
+msgid "Pages (page)"
+msgstr ""
+
+#: views/import-page.php:102
+msgid "Duplicate Handling"
+msgstr ""
+
+#: views/import-page.php:104
+msgid "Skip existing posts"
+msgstr ""
+
+#: views/import-page.php:105
+msgid "Update existing posts"
+msgstr ""
+
+#: views/import-page.php:106
+msgid "Always create new (allow duplicates)"
+msgstr ""
+
+#: views/import-page.php:109
+#: views/import-page.php:112
+msgid "Items that match an existing post are left out. Your existing posts are not changed."
+msgstr ""
+
+#: views/import-page.php:110
+msgid "Items that match an existing post overwrite that post. Other items are created as new posts."
+msgstr ""
+
+#: views/import-page.php:111
+msgid "Every item is created as a new post, even if a post with the same title or slug exists. WordPress adds a number to repeated slugs."
+msgstr ""
+
+#: views/import-page.php:117
+msgid "Match Existing Posts By"
+msgstr ""
+
+#: views/import-page.php:119
+msgid "Post Title"
+msgstr ""
+
+#: views/import-page.php:120
+msgid "Post Slug (post_name)"
+msgstr ""
+
+#: views/import-page.php:130
+msgid "Download and import media files (featured images & attachments)"
+msgstr ""
+
+#: views/import-page.php:135
+msgid "Import taxonomies & auto-create missing categories/tags"
+msgstr ""
+
+#: views/import-page.php:145
+msgid "Choose Different File"
+msgstr ""
+
+#: views/import-page.php:148
+msgid "Start Import"
+msgstr ""
+
+#: views/import-page.php:157
+msgid "Importing data..."
+msgstr ""
+
+#: views/import-page.php:158
+msgid "Please do not close this window while the import is in progress."
+msgstr ""
+
+#: views/import-page.php:163
+msgid "Processing items..."
+msgstr ""
+
+#: views/import-page.php:171
+msgid "Import complete"
+msgstr ""
+
+#: views/import-page.php:172
+msgid "Every item in the file has been processed. Review the counts and any messages below."
+msgstr ""
+
+#: views/import-page.php:178
+msgid "Created"
+msgstr ""
+
+#: views/import-page.php:182
+msgid "Updated"
+msgstr ""
+
+#: views/import-page.php:186
+msgid "Skipped"
+msgstr ""
+
+#: views/import-page.php:190
+msgid "Errors"
+msgstr ""
+
+#: views/import-page.php:195
+msgid "Import messages"
+msgstr ""
+
+#: views/import-page.php:201
+msgid "Import Another File"
+msgstr ""
+
+#: views/partials/header.php:32
+msgid "Data Shifter Export"
+msgstr ""
+
+#: views/partials/header.php:32
+msgid "Data Shifter Import"
+msgstr ""
+
+#: views/partials/header.php:37
+msgid "Choose content, filter it, pick fields and download a file you can import on any site."
+msgstr ""
+
+#: views/partials/header.php:38
+msgid "Upload a Data Shifter, CSV or XML file, review a preview, then import it into this site."
+msgstr ""
+
+#: views/partials/header.php:44
+msgid "Data Shifter sections"
+msgstr ""
