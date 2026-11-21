@@ -40,7 +40,7 @@ Data Shifter does not send any data to Codixr or to any other service, and it do
 
 When you import a file with the "Download and import media files" option turned on, Data Shifter downloads each image from the URL stored in the file, unless the image data is already bundled in a ZIP package. These requests go only to the addresses listed in your import file, and they send your site address in the User-Agent header, as the standard WordPress HTTP API does. Turn the option off to import without any outgoing requests.
 
-Export files and uploaded import files are stored briefly in `wp-content/uploads/data-shifter/temp/`, which is protected from direct browsing. Export files are deleted after download, and import files are deleted when the import finishes or the plugin is deactivated.
+Export files and uploaded import files are stored briefly in `wp-content/uploads/data-shifter/temp/`, which is protected from direct browsing. Export files are deleted after download, and import files are deleted when the import finishes or the plugin is deactivated. ZIP packages may contain only `data.json` and media files in a `media` folder; a package with any other file, such as a PHP file, is refused. In CSV exports, cells that start with =, +, -, @, a tab or a carriage return get a leading single quote so spreadsheet apps do not run them as formulas.
 
 == Installation ==
 

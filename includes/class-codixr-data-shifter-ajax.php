@@ -5,7 +5,7 @@
  * Registers and handles every AJAX action for the plugin, including
  * multi-step export, drag-and-drop chunked uploads, and resilient client-side batch imports.
  *
- * @package Data_Shifter
+ * @package Codixr_Data_Shifter
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,28 +22,29 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 /**
- * Class Data_Shifter_Ajax
+ * Class Codixr_Data_Shifter_Ajax
  */
-class Data_Shifter_Ajax {
+class Codixr_Data_Shifter_Ajax {
 
 	/**
 	 * Constructor — register all wp_ajax_ hooks.
 	 */
 	public function __construct() {
 		$actions = array(
-			'data_shifter_get_post_types',
-			'data_shifter_get_taxonomies',
-			'data_shifter_get_fields',
-			'data_shifter_preview_export',
-			'data_shifter_run_export',
-			'data_shifter_download_export',
-			'data_shifter_upload_import',
-			'data_shifter_upload_chunk',
-			'data_shifter_init_import',
-			'data_shifter_import_batch',
-			'data_shifter_finalize_import',
-			'data_shifter_run_import',
-			'data_shifter_import_progress',
+			'codixr_data_shifter_get_post_types',
+			'codixr_data_shifter_get_taxonomies',
+			'codixr_data_shifter_get_fields',
+			'codixr_data_shifter_preview_export',
+			'codixr_data_shifter_run_export',
+			'codixr_data_shifter_download_export',
+			'codixr_data_shifter_upload_import',
+			'codixr_data_shifter_start_upload',
+			'codixr_data_shifter_upload_chunk',
+			'codixr_data_shifter_init_import',
+			'codixr_data_shifter_import_batch',
+			'codixr_data_shifter_finalize_import',
+			'codixr_data_shifter_run_import',
+			'codixr_data_shifter_import_progress',
 		);
 
 		foreach ( $actions as $action ) {
@@ -63,7 +64,7 @@ class Data_Shifter_Ajax {
 	 * @return void
 	 */
 	private function verify_request() {
-		if ( ! check_ajax_referer( 'data_shifter_nonce', 'nonce', false ) ) {
+		if ( ! check_ajax_referer( 'codixr_data_shifter_nonce', 'nonce', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'data-shifter' ) ), 403 );
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -77,22 +78,18 @@ class Data_Shifter_Ajax {
 	 * @return string Absolute path with trailing slash.
 	 */
 	private function get_temp_dir() {
-		$upload_dir = wp_upload_dir();
-		$temp       = trailingslashit( $upload_dir['basedir'] ) . 'data-shifter/temp/';
-		if ( ! is_dir( $temp ) ) {
-			wp_mkdir_p( $temp );
-		}
-		return $temp;
+		return Codixr_Data_Shifter_Files::get_temp_dir();
 	}
 
 	/**
-	 * Validate that a file is inside the temp directory (prevents path traversal).
+	 * Validate that a file is inside the temp directory (prevents path traversal)
+	 * and belongs to the current user.
 	 *
 	 * @param string $filename Base filename.
 	 * @return string|false Normalized absolute file path or false on failure.
 	 */
 	private function validate_temp_file( $filename ) {
-		if ( empty( $filename ) ) {
+		if ( empty( $filename ) || ! Codixr_Data_Shifter_Files::is_owner( $filename ) ) {
 			return false;
 		}
 
@@ -133,7 +130,7 @@ class Data_Shifter_Ajax {
 		$set_dir  = function ( $dirs ) use ( $temp_dir ) {
 			$dirs['path']   = $temp_dir;
 			$dirs['subdir'] = '';
-			$dirs['url']    = trailingslashit( $dirs['baseurl'] ) . 'data-shifter/temp';
+			$dirs['url']    = trailingslashit( $dirs['baseurl'] ) . CODIXR_DATA_SHIFTER_SLUG . '/temp';
 			return $dirs;
 		};
 
@@ -264,7 +261,7 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_get_post_types() {
+	public function codixr_data_shifter_get_post_types() {
 		$this->verify_request();
 
 		$post_types = get_post_types( array( 'public' => true ), 'objects' );
@@ -300,7 +297,7 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_get_taxonomies() {
+	public function codixr_data_shifter_get_taxonomies() {
 		$this->verify_request();
 
 		$post_type = isset( $_POST['post_type'] ) ? sanitize_text_field( wp_unslash( $_POST['post_type'] ) ) : '';
@@ -347,7 +344,7 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_get_fields() {
+	public function codixr_data_shifter_get_fields() {
 		$this->verify_request();
 
 		global $wpdb;
@@ -397,7 +394,7 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_preview_export() {
+	public function codixr_data_shifter_preview_export() {
 		$this->verify_request();
 
 		if ( function_exists( 'set_time_limit' ) ) {
@@ -410,7 +407,7 @@ class Data_Shifter_Ajax {
 
 		try {
 			$config   = $this->build_export_config();
-			$exporter = new Data_Shifter_Exporter( $config );
+			$exporter = new Codixr_Data_Shifter_Exporter( $config );
 			$preview  = $exporter->preview( 5 );
 
 			wp_send_json_success(
@@ -429,7 +426,7 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_run_export() {
+	public function codixr_data_shifter_run_export() {
 		$this->verify_request();
 
 		if ( function_exists( 'set_time_limit' ) ) {
@@ -442,12 +439,13 @@ class Data_Shifter_Ajax {
 
 		try {
 			$config    = $this->build_export_config();
-			$exporter  = new Data_Shifter_Exporter( $config );
+			$exporter  = new Codixr_Data_Shifter_Exporter( $config );
 			$format    = $config['format'];
 			$extension = $format;
-			$filename  = 'data-shifter-export-' . $config['post_type'] . '-' . gmdate( 'Y-m-d-His' ) . '.' . $extension;
+			$filename  = Codixr_Data_Shifter_Files::unique_filename( 'export-' . sanitize_key( $config['post_type'] ), $extension );
 			$temp_dir  = $this->get_temp_dir();
 			$filepath  = $temp_dir . $filename;
+			Codixr_Data_Shifter_Files::set_owner( $filename );
 
 			$res = $exporter->export_to_file( $filepath );
 
@@ -461,9 +459,9 @@ class Data_Shifter_Ajax {
 
 			$download_url = add_query_arg(
 				array(
-					'action' => 'data_shifter_download_export',
+					'action' => 'codixr_data_shifter_download_export',
 					'file'   => rawurlencode( $filename ),
-					'nonce'  => wp_create_nonce( 'data_shifter_nonce' ),
+					'nonce'  => wp_create_nonce( 'codixr_data_shifter_nonce' ),
 				),
 				admin_url( 'admin-ajax.php' )
 			);
@@ -486,8 +484,8 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_download_export() {
-		if ( ! check_ajax_referer( 'data_shifter_nonce', 'nonce', false ) ) {
+	public function codixr_data_shifter_download_export() {
+		if ( ! check_ajax_referer( 'codixr_data_shifter_nonce', 'nonce', false ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'data-shifter' ), 403 );
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -533,6 +531,7 @@ class Data_Shifter_Ajax {
 
 		readfile( $norm_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions
 		wp_delete_file( $norm_file );
+		Codixr_Data_Shifter_Files::forget_owner( $filename );
 		exit;
 	}
 
@@ -541,7 +540,7 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_upload_import() {
+	public function codixr_data_shifter_upload_import() {
 		$this->verify_request();
 
 		if ( function_exists( 'set_time_limit' ) ) {
@@ -572,11 +571,13 @@ class Data_Shifter_Ajax {
 			wp_send_json_error( array( 'message' => $msg ) );
 		}
 
-		$original_name = sanitize_file_name( isset( $file['name'] ) ? $file['name'] : '' );
+		$raw_name      = isset( $file['name'] ) ? sanitize_text_field( $file['name'] ) : '';
+		$original_name = sanitize_file_name( $raw_name );
 		$extension     = strtolower( pathinfo( $original_name, PATHINFO_EXTENSION ) );
 		$allowed       = array( 'json', 'zip', 'csv', 'xml' );
 
-		if ( ! in_array( $extension, $allowed, true ) ) {
+		// Check the raw name too, so double extensions such as shell.php.json are refused.
+		if ( ! in_array( $extension, $allowed, true ) || Codixr_Data_Shifter_Files::has_blocked_extension( $raw_name ) ) {
 			wp_send_json_error(
 				array(
 					'message' => sprintf(
@@ -589,8 +590,9 @@ class Data_Shifter_Ajax {
 		}
 
 		$temp_dir  = $this->get_temp_dir();
-		$filename  = 'data-shifter-import-' . gmdate( 'Y-m-d-His' ) . '-' . wp_generate_password( 6, false ) . '.' . $extension;
+		$filename  = Codixr_Data_Shifter_Files::unique_filename( 'import', $extension );
 		$dest_path = $temp_dir . $filename;
+		Codixr_Data_Shifter_Files::set_owner( $filename );
 
 		$moved = $this->move_upload_to_temp( $file, $filename, $extension );
 		if ( ! $moved ) {
@@ -598,7 +600,7 @@ class Data_Shifter_Ajax {
 		}
 
 		try {
-			$importer = new Data_Shifter_Importer( $dest_path, $extension );
+			$importer = new Codixr_Data_Shifter_Importer( $dest_path, $extension );
 			$parsed   = $importer->parse();
 
 			if ( is_wp_error( $parsed ) ) {
@@ -625,11 +627,50 @@ class Data_Shifter_Ajax {
 	}
 
 	/**
+	 * Start a chunked upload.
+	 *
+	 * Creates an unguessable upload ID on the server, bound to the current user,
+	 * the validated file extension and the number of chunks.
+	 *
+	 * @return void
+	 */
+	public function codixr_data_shifter_start_upload() {
+		$this->verify_request();
+
+		$raw_name      = isset( $_POST['filename'] ) ? sanitize_text_field( wp_unslash( $_POST['filename'] ) ) : '';
+		$original_name = sanitize_file_name( $raw_name );
+		$total_chunks  = isset( $_POST['total_chunks'] ) ? absint( $_POST['total_chunks'] ) : 0;
+		$extension     = strtolower( pathinfo( $original_name, PATHINFO_EXTENSION ) );
+		$allowed       = array( 'json', 'zip', 'csv', 'xml' );
+
+		if ( empty( $original_name ) || $total_chunks < 1 || $total_chunks > 100000 ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid chunk upload parameters.', 'data-shifter' ) ) );
+		}
+		if ( ! in_array( $extension, $allowed, true ) || Codixr_Data_Shifter_Files::has_blocked_extension( $raw_name ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid file extension.', 'data-shifter' ) ) );
+		}
+
+		$upload_id = Codixr_Data_Shifter_Files::token();
+		set_transient(
+			'codixr_data_shifter_upload_' . $upload_id,
+			array(
+				'user'  => get_current_user_id(),
+				'ext'   => $extension,
+				'total' => $total_chunks,
+				'next'  => 0,
+			),
+			Codixr_Data_Shifter_Files::TTL
+		);
+
+		wp_send_json_success( array( 'upload_id' => $upload_id ) );
+	}
+
+	/**
 	 * Handle chunked file uploads to support unlimited file sizes on any host.
 	 *
 	 * @return void
 	 */
-	public function data_shifter_upload_chunk() {
+	public function codixr_data_shifter_upload_chunk() {
 		$this->verify_request();
 
 		if ( function_exists( 'set_time_limit' ) ) {
@@ -640,27 +681,36 @@ class Data_Shifter_Ajax {
 		}
 		@ini_set( 'memory_limit', '1024M' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.PHP.IniSet.memory_limit_Disallowed, Squiz.PHP.DiscouragedFunctions.Discouraged -- Large files need more memory; failures are harmless.
 
-		$upload_id     = isset( $_POST['upload_id'] ) ? sanitize_file_name( wp_unslash( $_POST['upload_id'] ) ) : '';
-		$chunk_index   = isset( $_POST['chunk_index'] ) ? absint( $_POST['chunk_index'] ) : 0;
-		$total_chunks  = isset( $_POST['total_chunks'] ) ? absint( $_POST['total_chunks'] ) : 1;
-		$original_name = isset( $_POST['filename'] ) ? sanitize_file_name( wp_unslash( $_POST['filename'] ) ) : '';
+		// The upload ID is created by codixr_data_shifter_start_upload() and bound to the current user.
+		$upload_id   = isset( $_POST['upload_id'] ) ? Codixr_Data_Shifter_Files::sanitize_token( wp_unslash( $_POST['upload_id'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitize_token() (letters and digits only).
+		$chunk_index = isset( $_POST['chunk_index'] ) ? absint( $_POST['chunk_index'] ) : 0;
+		$upload      = $upload_id ? get_transient( 'codixr_data_shifter_upload_' . $upload_id ) : false;
 
-		if ( empty( $upload_id ) || empty( $original_name ) || $total_chunks < 1 ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid chunk upload parameters.', 'data-shifter' ) ) );
+		if ( empty( $upload_id ) || ! is_array( $upload ) || get_current_user_id() !== (int) $upload['user'] ) {
+			wp_send_json_error( array( 'message' => __( 'Upload session not found or expired. Please choose the file again.', 'data-shifter' ) ), 403 );
+		}
+		if ( $chunk_index + 1 === (int) $upload['next'] && $chunk_index < ( (int) $upload['total'] - 1 ) ) {
+			// A retry of a chunk that was already stored: accept it without writing it twice.
+			wp_send_json_success(
+				array(
+					'chunk'    => $chunk_index,
+					'received' => true,
+				)
+			);
+		}
+		if ( (int) $upload['next'] !== $chunk_index ) {
+			wp_send_json_error( array( 'message' => __( 'Upload chunks arrived out of order. Please choose the file again.', 'data-shifter' ) ) );
 		}
 
-		$extension = strtolower( pathinfo( $original_name, PATHINFO_EXTENSION ) );
-		$allowed   = array( 'json', 'zip', 'csv', 'xml' );
-		if ( ! in_array( $extension, $allowed, true ) ) {
-			wp_send_json_error( array( 'message' => __( 'Invalid file extension.', 'data-shifter' ) ) );
-		}
+		$extension    = $upload['ext'];
+		$total_chunks = (int) $upload['total'];
 
 		if ( empty( $_FILES['chunk_data'] ) || ! isset( $_FILES['chunk_data']['error'], $_FILES['chunk_data']['tmp_name'] ) || UPLOAD_ERR_OK !== $_FILES['chunk_data']['error'] ) {
 			wp_send_json_error( array( 'message' => __( 'Chunk upload failed on server.', 'data-shifter' ) ) );
 		}
 
 		$temp_dir   = $this->get_temp_dir();
-		$chunk_file = $temp_dir . 'chunk_' . preg_replace( '/[^a-zA-Z0-9_-]/', '', $upload_id ) . '.tmp';
+		$chunk_file = $temp_dir . 'chunk_' . $upload_id . '.tmp';
 
 		// Chunks are streamed with native file functions because WP_Filesystem
 		// cannot append to a file or read in buffered blocks.
@@ -686,7 +736,9 @@ class Data_Shifter_Ajax {
 		fclose( $in );
 		fclose( $out );
 
+		$upload['next'] = $chunk_index + 1;
 		if ( $chunk_index < ( $total_chunks - 1 ) ) {
+			set_transient( 'codixr_data_shifter_upload_' . $upload_id, $upload, Codixr_Data_Shifter_Files::TTL );
 			wp_send_json_success(
 				array(
 					'chunk'    => $chunk_index,
@@ -696,8 +748,10 @@ class Data_Shifter_Ajax {
 		}
 
 		// Final chunk reached: Assemble into final import file.
-		$final_filename = 'data-shifter-import-' . gmdate( 'Y-m-d-His' ) . '-' . wp_generate_password( 6, false ) . '.' . $extension;
+		delete_transient( 'codixr_data_shifter_upload_' . $upload_id );
+		$final_filename = Codixr_Data_Shifter_Files::unique_filename( 'import', $extension );
 		$dest_path      = $temp_dir . $final_filename;
+		Codixr_Data_Shifter_Files::set_owner( $final_filename );
 
 		// Same-directory move of a plugin temp file.
 		if ( ! rename( $chunk_file, $dest_path ) ) {
@@ -706,7 +760,7 @@ class Data_Shifter_Ajax {
 		// phpcs:enable WordPress.WP.AlternativeFunctions
 
 		try {
-			$importer = new Data_Shifter_Importer( $dest_path, $extension );
+			$importer = new Codixr_Data_Shifter_Importer( $dest_path, $extension );
 			$parsed   = $importer->parse();
 
 			if ( is_wp_error( $parsed ) ) {
@@ -741,7 +795,7 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_init_import() {
+	public function codixr_data_shifter_init_import() {
 		$this->verify_request();
 
 		if ( function_exists( 'set_time_limit' ) ) {
@@ -787,7 +841,7 @@ class Data_Shifter_Ajax {
 		}
 
 		try {
-			$importer = new Data_Shifter_Importer( $norm_file, $format );
+			$importer = new Codixr_Data_Shifter_Importer( $norm_file, $format );
 			$parsed   = $importer->parse();
 
 			if ( is_wp_error( $parsed ) ) {
@@ -813,7 +867,7 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_import_batch() {
+	public function codixr_data_shifter_import_batch() {
 		$this->verify_request();
 
 		if ( function_exists( 'set_time_limit' ) ) {
@@ -842,7 +896,7 @@ class Data_Shifter_Ajax {
 		);
 
 		try {
-			$res = Data_Shifter_Importer::process_batch( $session_id, $offset, $batch_size, $post_config );
+			$res = Codixr_Data_Shifter_Importer::process_batch( $session_id, $offset, $batch_size, $post_config );
 			if ( is_wp_error( $res ) ) {
 				wp_send_json_error( array( 'message' => $res->get_error_message() ) );
 			}
@@ -857,7 +911,7 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_finalize_import() {
+	public function codixr_data_shifter_finalize_import() {
 		$this->verify_request();
 
 		if ( function_exists( 'set_time_limit' ) ) {
@@ -870,7 +924,7 @@ class Data_Shifter_Ajax {
 		}
 
 		try {
-			$res = Data_Shifter_Importer::finalize_session( $session_id );
+			$res = Codixr_Data_Shifter_Importer::finalize_session( $session_id );
 			if ( is_wp_error( $res ) ) {
 				wp_send_json_error( array( 'message' => $res->get_error_message() ) );
 			}
@@ -885,7 +939,7 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_run_import() {
+	public function codixr_data_shifter_run_import() {
 		$this->verify_request();
 
 		if ( function_exists( 'set_time_limit' ) ) {
@@ -920,7 +974,7 @@ class Data_Shifter_Ajax {
 		);
 
 		try {
-			$importer = new Data_Shifter_Importer( $norm_file, $format );
+			$importer = new Codixr_Data_Shifter_Importer( $norm_file, $format );
 			$parsed   = $importer->parse();
 
 			if ( is_wp_error( $parsed ) ) {
@@ -928,6 +982,7 @@ class Data_Shifter_Ajax {
 			}
 
 			$results = $importer->import( $import_config );
+			$importer->cleanup_extracted();
 
 			if ( is_wp_error( $results ) ) {
 				wp_send_json_error( array( 'message' => $results->get_error_message() ) );
@@ -954,10 +1009,10 @@ class Data_Shifter_Ajax {
 	 *
 	 * @return void
 	 */
-	public function data_shifter_import_progress() {
+	public function codixr_data_shifter_import_progress() {
 		$this->verify_request();
 
-		$progress = get_transient( 'data_shifter_import_progress' );
+		$progress = get_transient( 'codixr_data_shifter_import_progress' );
 
 		if ( false === $progress ) {
 			$progress = array(

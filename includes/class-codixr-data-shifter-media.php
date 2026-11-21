@@ -5,7 +5,7 @@
  * Handles media import/export operations including downloading remote images,
  * extracting media from post content, custom fields (meta), and managing attachment metadata.
  *
- * @package Data_Shifter
+ * @package Codixr_Data_Shifter
  * @since   1.0.0
  */
 
@@ -28,13 +28,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 /**
- * Class Data_Shifter_Media
+ * Class Codixr_Data_Shifter_Media
  *
  * All static methods for media import and export operations.
  *
  * @since 1.0.0
  */
-class Data_Shifter_Media {
+class Codixr_Data_Shifter_Media {
 
 	/**
 	 * Download or save an image from a URL or bundled base64 data and add to the WordPress Media Library.
@@ -50,18 +50,7 @@ class Data_Shifter_Media {
 	 */
 	public static function import_from_url( $url, $post_id = 0, $base64_data = '', $extra_data = array() ) {
 		if ( empty( $url ) || ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
-			return new WP_Error( 'data_shifter_invalid_url', __( 'Invalid URL provided for media import.', 'data-shifter' ) );
-		}
-
-		// Require necessary files for media handling.
-		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/image.php';
-		}
-		if ( ! function_exists( 'wp_read_image_metadata' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/media.php';
-		}
-		if ( ! function_exists( 'download_url' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
+			return new WP_Error( 'codixr_data_shifter_invalid_url', __( 'Invalid URL provided for media import.', 'data-shifter' ) );
 		}
 
 		// Check if we already imported this URL in this installation to avoid duplicates.
@@ -96,7 +85,7 @@ class Data_Shifter_Media {
 
 		if ( $is_local_domain ) {
 			return new WP_Error(
-				'data_shifter_local_unreachable',
+				'codixr_data_shifter_local_unreachable',
 				sprintf(
 					/* translators: %s: host name */
 					__( 'Local host %s cannot be reached from this server without bundled image data.', 'data-shifter' ),
@@ -111,14 +100,14 @@ class Data_Shifter_Media {
 			array(
 				'timeout' => 15,
 				'headers' => array(
-					'User-Agent' => 'WordPress/Data Shifter-Importer; ' . home_url(),
+					'User-Agent' => 'WordPress/CodixrDataShifter-Importer; ' . home_url(),
 				),
 			)
 		);
 
 		if ( is_wp_error( $response ) ) {
 			return new WP_Error(
-				'data_shifter_download_failed',
+				'codixr_data_shifter_download_failed',
 				sprintf(
 					/* translators: 1: URL, 2: error message */
 					__( 'Failed to download media from %1$s: %2$s', 'data-shifter' ),
@@ -131,7 +120,7 @@ class Data_Shifter_Media {
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( 200 !== $response_code ) {
 			return new WP_Error(
-				'data_shifter_download_http_error',
+				'codixr_data_shifter_download_http_error',
 				sprintf(
 					/* translators: 1: URL, 2: HTTP status code */
 					__( 'HTTP error %2$d when downloading %1$s.', 'data-shifter' ),
@@ -143,7 +132,7 @@ class Data_Shifter_Media {
 
 		$body = wp_remote_retrieve_body( $response );
 		if ( empty( $body ) ) {
-			return new WP_Error( 'data_shifter_empty_response', __( 'Downloaded file is empty.', 'data-shifter' ) );
+			return new WP_Error( 'codixr_data_shifter_empty_response', __( 'Downloaded file is empty.', 'data-shifter' ) );
 		}
 
 		return self::save_image_binary( $body, $url, $post_id, $extra_data );
@@ -162,15 +151,11 @@ class Data_Shifter_Media {
 	 * @return int|WP_Error Attachment ID on success, WP_Error on failure.
 	 */
 	public static function save_image_binary( $body, $url, $post_id = 0, $extra_data = array() ) {
-		// Require necessary files for media handling.
+		// wp_generate_attachment_metadata() (called below) lives in wp-admin/includes/image.php.
+		// The other functions used here (wp_upload_bits, wp_check_filetype, wp_insert_attachment)
+		// are always loaded by core.
 		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/image.php';
-		}
-		if ( ! function_exists( 'wp_read_image_metadata' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/media.php';
-		}
-		if ( ! function_exists( 'download_url' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
 
 		// Determine the filename from the URL, stripping query parameters.
@@ -207,14 +192,14 @@ class Data_Shifter_Media {
 		$upload = wp_upload_bits( $filename, null, $body );
 
 		if ( ! empty( $upload['error'] ) ) {
-			return new WP_Error( 'data_shifter_upload_failed', $upload['error'] );
+			return new WP_Error( 'codixr_data_shifter_upload_failed', $upload['error'] );
 		}
 
 		// Determine MIME type.
 		$filetype = wp_check_filetype( $upload['file'], null );
 		if ( empty( $filetype['type'] ) ) {
 			wp_delete_file( $upload['file'] );
-			return new WP_Error( 'data_shifter_invalid_filetype', __( 'Could not determine file type.', 'data-shifter' ) );
+			return new WP_Error( 'codixr_data_shifter_invalid_filetype', __( 'Could not determine file type.', 'data-shifter' ) );
 		}
 
 		$title       = ! empty( $extra_data['title'] ) ? $extra_data['title'] : ( $path_parts['filename'] ?? 'Image' );
@@ -250,7 +235,7 @@ class Data_Shifter_Media {
 		}
 
 		// Store original source URL as meta for future duplicate detection.
-		update_post_meta( $attachment_id, '_data_shifter_source_url', esc_url_raw( $url ) );
+		update_post_meta( $attachment_id, '_codixr_data_shifter_source_url', esc_url_raw( $url ) );
 
 		return (int) $attachment_id;
 	}
@@ -314,24 +299,8 @@ class Data_Shifter_Media {
 						}
 					} else {
 						// External or unattached image — check if present in local uploads folder.
-						$upload_dir = wp_upload_dir();
-						$baseurl    = untrailingslashit( $upload_dir['baseurl'] );
-						$basedir    = untrailingslashit( $upload_dir['basedir'] );
-						$base64     = '';
-
-						$clean_img_url = preg_replace( '/^https?:/i', '', $img_url );
-						$clean_baseurl = preg_replace( '/^https?:/i', '', $baseurl );
-
-						if ( strpos( $clean_img_url, $clean_baseurl ) === 0 ) {
-							$rel_path   = substr( $clean_img_url, strlen( $clean_baseurl ) );
-							$local_path = $basedir . $rel_path;
-							if ( file_exists( $local_path ) && filesize( $local_path ) < 15728640 ) {
-								$contents = @file_get_contents( $local_path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Missing files are handled by the caller.
-								if ( false !== $contents ) {
-									$base64 = base64_encode( $contents ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Bundles image bytes inside export packages.
-								}
-							}
-						}
+						// Read the file only if it is a media file inside the uploads folder.
+						$base64 = Codixr_Data_Shifter_Files::read_local_upload( $img_url );
 
 						$alt           = '';
 						$img_tag_index = array_search( $img_url, $matches[1], true );
@@ -467,24 +436,8 @@ class Data_Shifter_Media {
 					}
 
 					// Read from local uploads if available.
-					$upload_dir = wp_upload_dir();
-					$baseurl    = untrailingslashit( $upload_dir['baseurl'] );
-					$basedir    = untrailingslashit( $upload_dir['basedir'] );
-					$base64     = '';
-
-					$clean_data    = preg_replace( '/^https?:/i', '', $data );
-					$clean_baseurl = preg_replace( '/^https?:/i', '', $baseurl );
-
-					if ( strpos( $clean_data, $clean_baseurl ) === 0 ) {
-						$rel_path   = substr( $clean_data, strlen( $clean_baseurl ) );
-						$local_path = $basedir . $rel_path;
-						if ( file_exists( $local_path ) && filesize( $local_path ) < 15728640 ) {
-							$contents = @file_get_contents( $local_path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Missing files are handled by the caller.
-							if ( false !== $contents ) {
-								$base64 = base64_encode( $contents ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Bundles image bytes inside export packages.
-							}
-						}
-					}
+					// Read the file only if it is a media file inside the uploads folder.
+					$base64 = Codixr_Data_Shifter_Files::read_local_upload( $data );
 
 					$media_items[] = array(
 						'id'          => 0,
@@ -575,7 +528,7 @@ class Data_Shifter_Media {
 		$attachment_id = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT post_id FROM {$wpdb->postmeta}
-                WHERE meta_key IN ( '_data_shifter_source_url', '_datashift_source_url' )
+                WHERE meta_key IN ( '_codixr_data_shifter_source_url', '_data_shifter_source_url', '_datashift_source_url' )
                 AND meta_value = %s
                 LIMIT 1",
 				esc_url_raw( $url )

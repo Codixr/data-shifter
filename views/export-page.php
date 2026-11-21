@@ -4,7 +4,7 @@
  *
  * Multi-step wizard for exporting WordPress data.
  *
- * @package Data_Shifter
+ * @package Codixr_Data_Shifter
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -13,8 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="wrap data-shifter-wrap">
 	<?php
-	$data_shifter_current_tab = 'export';
-	require DATA_SHIFTER_VIEWS . 'partials/header.php';
+	$codixr_data_shifter_current_tab = 'export';
+	require CODIXR_DATA_SHIFTER_VIEWS . 'partials/header.php';
 	?>
 
 	<!-- Progress Steps Bar -->

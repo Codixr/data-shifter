@@ -4,7 +4,7 @@
  * Handles export wizard, step navigation, AJAX requests, drag-and-drop file upload,
  * data preview, and import execution.
  *
- * @package Data_Shifter
+ * @package Codixr_Data_Shifter
  * @since   1.0.0
  */
 
@@ -26,7 +26,7 @@
 			.replace(/'/g, '&#039;');
 	};
 
-	const DataShifter = {
+	const CodixrDataShifter = {
 		currentStep: 1,
 		selectedPostType: null,
 		postTypesCache: [],
@@ -53,7 +53,7 @@
 			data = data || {};
 			const formData = new FormData();
 			formData.append('action', action);
-			formData.append('nonce', data_shifter_ajax.nonce);
+			formData.append('nonce', codixr_data_shifter_ajax.nonce);
 
 			if (data instanceof FormData) {
 				for (let [key, val] of data.entries()) {
@@ -71,7 +71,7 @@
 				}
 			}
 
-			return fetch(data_shifter_ajax.ajax_url, {
+			return fetch(codixr_data_shifter_ajax.ajax_url, {
 				method: 'POST',
 				credentials: 'same-origin',
 				body: formData,
@@ -302,7 +302,7 @@
 			const grid = document.getElementById('data-shifter-post-type-grid');
 			if (!grid) return;
 
-			this.ajax('data_shifter_get_post_types').then(function (res) {
+			this.ajax('codixr_data_shifter_get_post_types').then(function (res) {
 				if (!res.success || !res.data) {
 					grid.innerHTML = '<p class="error">Failed to load post types.</p>';
 					return;
@@ -356,7 +356,7 @@
 
 			select.innerHTML = '<option value="">Loading taxonomies...</option>';
 
-			this.ajax('data_shifter_get_taxonomies', { post_type: postType }).then(function (res) {
+			this.ajax('codixr_data_shifter_get_taxonomies', { post_type: postType }).then(function (res) {
 				if (!res.success || !res.data) {
 					select.innerHTML = '<option value="">No taxonomies available</option>';
 					return;
@@ -384,7 +384,7 @@
 
 			list.innerHTML = '<div class="data-shifter-loading"><span class="spinner is-active"></span><p>Loading custom fields...</p></div>';
 
-			this.ajax('data_shifter_get_fields', { post_type: postType }).then(function (res) {
+			this.ajax('codixr_data_shifter_get_fields', { post_type: postType }).then(function (res) {
 				if (!res.success || !res.data || res.data.length === 0) {
 					list.innerHTML = '<p class="description">No custom fields found for this post type.</p>';
 					if (internalWrapper) internalWrapper.style.display = 'none';
@@ -471,7 +471,7 @@
 
 			if (btn) btn.disabled = true;
 
-			this.ajax('data_shifter_preview_export', config).then(function (res) {
+			this.ajax('codixr_data_shifter_preview_export', config).then(function (res) {
 				if (btn) btn.disabled = false;
 
 				if (!res.success || !res.data) {
@@ -511,7 +511,7 @@
 				btn.innerHTML = '<span class="spinner is-active" style="float:none; margin:0 6px 0 0;"></span> Exporting...';
 			}
 
-			this.ajax('data_shifter_run_export', config).then(function (res) {
+			this.ajax('codixr_data_shifter_run_export', config).then(function (res) {
 				if (btn) {
 					btn.disabled = false;
 					btn.innerHTML = '<span class="dashicons dashicons-database-export"></span> Run Export';
@@ -581,7 +581,7 @@
 			// Populate post types dropdown on import page
 			const ptSelect = document.getElementById('import-post-type');
 			if (ptSelect) {
-				this.ajax('data_shifter_get_post_types').then(function (res) {
+				this.ajax('codixr_data_shifter_get_post_types').then(function (res) {
 					if (res.success && res.data && res.data.length > 0) {
 						let currentVal = ptSelect.value;
 						let html = '';
@@ -681,10 +681,11 @@
 			if (dropzoneUploading) dropzoneUploading.style.display = 'block';
 
 			// Chunk size comes from the server so each chunk fits under upload_max_filesize and post_max_size.
-			const serverChunk = (typeof data_shifter_ajax !== 'undefined') ? parseInt(data_shifter_ajax.chunk_size, 10) : 0;
+			const serverChunk = (typeof codixr_data_shifter_ajax !== 'undefined') ? parseInt(codixr_data_shifter_ajax.chunk_size, 10) : 0;
 			const chunkSize = serverChunk > 0 ? serverChunk : 1024 * 1024;
 			const totalChunks = Math.max(1, Math.ceil(file.size / chunkSize));
-			const uploadId = 'ds_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+			// The upload ID is created by the server (codixr_data_shifter_start_upload) and tied to the current user.
+			let uploadId = '';
 			let currentChunk = 0;
 
 			function formatBytes(bytes) {
@@ -700,14 +701,12 @@
 				const end = Math.min(start + chunkSize, file.size);
 				const chunk = file.slice(start, end);
 
-				const dsConfig = (typeof data_shifter_ajax !== 'undefined') ? data_shifter_ajax : {};
+				const dsConfig = (typeof codixr_data_shifter_ajax !== 'undefined') ? codixr_data_shifter_ajax : {};
 				const formData = new FormData();
-				formData.append('action', 'data_shifter_upload_chunk');
+				formData.append('action', 'codixr_data_shifter_upload_chunk');
 				formData.append('nonce', dsConfig.nonce || '');
 				formData.append('upload_id', uploadId);
-				formData.append('filename', file.name);
 				formData.append('chunk_index', currentChunk);
-				formData.append('total_chunks', totalChunks);
 				formData.append('chunk_data', chunk, file.name);
 
 				const percent = Math.round(((currentChunk + 1) / totalChunks) * 100);
@@ -731,7 +730,10 @@
 					})
 					.then(function (res) {
 						if (!res.success) {
-							throw new Error(res.data && res.data.message ? res.data.message : 'Server returned an error');
+							// The server refused the file (for example a ZIP with a blocked entry): do not retry.
+							const refused = new Error(res.data && res.data.message ? res.data.message : 'Server returned an error');
+							refused.noRetry = true;
+							throw refused;
 						}
 
 						currentChunk++;
@@ -748,7 +750,7 @@
 						}
 					})
 					.catch(function (err) {
-						if (retryCount < 3) {
+						if (retryCount < 3 && !(err && err.noRetry)) {
 							retryCount++;
 							if (uploadProgressText) {
 								uploadProgressText.textContent = 'Retrying chunk ' + (currentChunk + 1) + ' (attempt ' + retryCount + ')...';
@@ -764,7 +766,18 @@
 				sendChunk();
 			}
 
-			uploadNextChunk();
+			self.ajax('codixr_data_shifter_start_upload', { filename: file.name, total_chunks: totalChunks })
+				.then(function (res) {
+					if (!res || !res.success || !res.data || !res.data.upload_id) {
+						throw new Error(res && res.data && res.data.message ? res.data.message : 'Could not start the upload.');
+					}
+					uploadId = res.data.upload_id;
+					uploadNextChunk();
+				})
+				.catch(function (err) {
+					alert('Upload failed: ' + (err && err.message ? err.message : 'Upload connection error.'));
+					self.resetImport();
+				});
 		},
 
 		renderImportPreview: function (data) {
@@ -862,7 +875,7 @@
 			if (txt) txt.textContent = 'Preparing import session...';
 
 			// Step 1: Initialize session
-			self.ajax('data_shifter_init_import', config).then(function (initRes) {
+			self.ajax('codixr_data_shifter_init_import', config).then(function (initRes) {
 				if (!initRes.success || !initRes.data) {
 					throw new Error(initRes.data && initRes.data.message ? initRes.data.message : 'Failed to initialize import session.');
 				}
@@ -897,7 +910,7 @@
 						import_taxonomy: importTax,
 					};
 
-					self.ajax('data_shifter_import_batch', batchData).then(function (batchRes) {
+					self.ajax('codixr_data_shifter_import_batch', batchData).then(function (batchRes) {
 						if (!batchRes.success || !batchRes.data) {
 							throw new Error(batchRes.data && batchRes.data.message ? batchRes.data.message : 'Batch processing error.');
 						}
@@ -915,7 +928,7 @@
 							if (fill) fill.style.width = '99%';
 							if (txt) txt.textContent = 'Linking hierarchy and finalizing import...';
 
-							self.ajax('data_shifter_finalize_import', { session_id: sessionId }).then(function (finalRes) {
+							self.ajax('codixr_data_shifter_finalize_import', { session_id: sessionId }).then(function (finalRes) {
 								if (progressSection) progressSection.style.display = 'none';
 								if (!finalRes.success || !finalRes.data) {
 									throw new Error(finalRes.data && finalRes.data.message ? finalRes.data.message : 'Finalization failed.');
@@ -1007,6 +1020,6 @@
 	};
 
 	document.addEventListener('DOMContentLoaded', function () {
-		DataShifter.init();
+		CodixrDataShifter.init();
 	});
 })();

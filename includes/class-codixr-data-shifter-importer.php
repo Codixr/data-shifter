@@ -6,7 +6,7 @@
  * with full support for client-side batching, local-to-live domain rewrites,
  * deep custom field media extraction, and hierarchical relationship resolution.
  *
- * @package Data_Shifter
+ * @package Codixr_Data_Shifter
  * @since   1.0.0
  */
 
@@ -38,9 +38,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 /**
- * Class Data_Shifter_Importer
+ * Class Codixr_Data_Shifter_Importer
  */
-class Data_Shifter_Importer {
+class Codixr_Data_Shifter_Importer {
 
 	/**
 	 * Path to the file being imported.
@@ -182,19 +182,46 @@ class Data_Shifter_Importer {
 			return new WP_Error( 'zip_unsupported', __( 'ZipArchive is not enabled on this server.', 'data-shifter' ) );
 		}
 
-		$upload_dir = wp_upload_dir();
-		$extract_to = trailingslashit( $upload_dir['basedir'] ) . 'data-shifter/temp/zip_' . md5( $this->file_path ) . '/';
-
-		if ( ! is_dir( $extract_to ) ) {
-			wp_mkdir_p( $extract_to );
-		}
+		$extract_to = Codixr_Data_Shifter_Files::get_temp_dir() . 'zip_' . md5( $this->file_path ) . '/';
 
 		$zip = new ZipArchive();
 		if ( true !== $zip->open( $this->file_path ) ) {
 			return new WP_Error( 'zip_open_failed', __( 'Could not open ZIP package.', 'data-shifter' ) );
 		}
 
-		$zip->extractTo( $extract_to );
+		// Check every entry before anything is written: only data.json and media
+		// files inside media/ are allowed. Executable types and path traversal
+		// reject the whole package.
+		$entries = array();
+		for ( $i = 0; $i < $zip->numFiles; $i++ ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- ZipArchive property.
+			$name  = (string) $zip->getNameIndex( $i );
+			$valid = Codixr_Data_Shifter_Files::validate_zip_entry( $name );
+			if ( is_wp_error( $valid ) ) {
+				$zip->close();
+				return $valid;
+			}
+			if ( '/' !== substr( $name, -1 ) ) {
+				$entries[] = $name;
+			}
+		}
+
+		if ( ! is_dir( $extract_to . 'media' ) ) {
+			wp_mkdir_p( $extract_to . 'media' );
+		}
+
+		// Extract only the validated entries, one by one.
+		foreach ( $entries as $name ) {
+			$in = $zip->getStream( $name );
+			if ( ! $in ) {
+				continue;
+			}
+			$out = fopen( $extract_to . $name, 'wb' );
+			if ( $out ) {
+				stream_copy_to_stream( $in, $out );
+				fclose( $out );
+			}
+			fclose( $in );
+		}
 		$zip->close();
 
 		$this->extracted_dir = $extract_to;
@@ -218,11 +245,7 @@ class Data_Shifter_Importer {
 		$this->items             = $data['items'];
 		$this->total_items       = count( $this->items );
 
-		// Attach extracted directory base path to each item for disk media loading.
-		foreach ( $this->items as &$item ) {
-			$item['_extracted_dir'] = $extract_to;
-		}
-		unset( $item );
+		// Media files are read from the server-side extraction folder only (see get_zip_media_path()).
 
 		$this->collect_field_names_from_items();
 
@@ -307,7 +330,7 @@ class Data_Shifter_Importer {
 		}
 
 		// Clean and trim headers.
-		$headers           = array_map( 'trim', $headers );
+		$headers           = array_map( 'trim', array_map( array( 'Codixr_Data_Shifter_Files', 'csv_unescape_cell' ), $headers ) );
 		$this->field_names = $headers;
 
 		$this->items = array();
@@ -324,6 +347,7 @@ class Data_Shifter_Importer {
 				$row = array_slice( $row, 0, $head_count );
 			}
 
+			$row           = array_map( array( 'Codixr_Data_Shifter_Files', 'csv_unescape_cell' ), $row );
 			$row_data      = array_combine( $headers, $row );
 			$this->items[] = $this->transform_csv_row_to_item( $row_data );
 		}
@@ -622,17 +646,13 @@ class Data_Shifter_Importer {
 	 * @return array Session info.
 	 */
 	public function create_session( array $config = array() ) {
-		$upload_dir = wp_upload_dir();
-		$temp_dir   = trailingslashit( $upload_dir['basedir'] ) . 'data-shifter/temp/';
-		if ( ! is_dir( $temp_dir ) ) {
-			wp_mkdir_p( $temp_dir );
-		}
-
-		$session_id   = 'ds_sess_' . wp_generate_password( 16, false );
-		$session_file = $temp_dir . $session_id . '.json';
+		$temp_dir     = Codixr_Data_Shifter_Files::get_temp_dir();
+		$session_id   = Codixr_Data_Shifter_Files::token();
+		$session_file = $temp_dir . 'session_' . $session_id . '.json';
 
 		$session_data = array(
 			'session_id'        => $session_id,
+			'user_id'           => get_current_user_id(),
 			'file_path'         => $this->file_path,
 			'format'            => $this->format,
 			'post_type'         => $this->post_type,
@@ -673,10 +693,9 @@ class Data_Shifter_Importer {
 	 * @return array|WP_Error Batch progress results.
 	 */
 	public static function process_batch( $session_id, $offset = 0, $batch_size = 5, $post_config = array() ) {
-		$upload_dir   = wp_upload_dir();
-		$session_file = trailingslashit( $upload_dir['basedir'] ) . 'data-shifter/temp/' . preg_replace( '/[^a-zA-Z0-9_-]/', '', $session_id ) . '.json';
+		$session_file = self::get_session_file( $session_id );
 
-		if ( ! file_exists( $session_file ) ) {
+		if ( ! $session_file || ! file_exists( $session_file ) ) {
 			return new WP_Error( 'session_not_found', __( 'Import session expired or not found. Please upload again.', 'data-shifter' ) );
 		}
 
@@ -686,6 +705,9 @@ class Data_Shifter_Importer {
 
 		if ( ! is_array( $session ) || ! isset( $session['items'] ) ) {
 			return new WP_Error( 'invalid_session_data', __( 'Corrupted session data.', 'data-shifter' ) );
+		}
+		if ( ! isset( $session['user_id'] ) || get_current_user_id() !== (int) $session['user_id'] ) {
+			return new WP_Error( 'session_forbidden', __( 'This import session belongs to another user.', 'data-shifter' ) );
 		}
 
 		$config = wp_parse_args( $post_config, $session['config'] );
@@ -771,6 +793,42 @@ class Data_Shifter_Importer {
 	}
 
 	/**
+	 * Return the absolute path of a session file, or an empty string for an invalid ID.
+	 *
+	 * @param string $session_id Session ID from the browser.
+	 * @return string
+	 */
+	protected static function get_session_file( $session_id ) {
+		$session_id = Codixr_Data_Shifter_Files::sanitize_token( $session_id );
+		if ( '' === $session_id ) {
+			return '';
+		}
+		return Codixr_Data_Shifter_Files::get_temp_dir() . 'session_' . $session_id . '.json';
+	}
+
+	/**
+	 * Resolve a media path from a ZIP package to a file inside this session's
+	 * extraction folder.
+	 *
+	 * The folder comes from the server-side session, never from the import
+	 * data, and the path must pass the same checks as ZIP entries.
+	 *
+	 * @param string $zip_path Relative path stored in data.json, for example media/photo.jpg.
+	 * @return string Absolute path, or an empty string when invalid or missing.
+	 */
+	protected function get_zip_media_path( $zip_path ) {
+		if ( empty( $this->extracted_dir ) || ! is_string( $zip_path ) || true !== Codixr_Data_Shifter_Files::validate_zip_entry( $zip_path ) || 0 !== strpos( $zip_path, 'media/' ) ) {
+			return '';
+		}
+		$base = realpath( $this->extracted_dir );
+		$file = realpath( path_join( $this->extracted_dir, $zip_path ) );
+		if ( ! $base || ! $file || 0 !== strpos( wp_normalize_path( $file ), trailingslashit( wp_normalize_path( $base ) ) ) || ! is_file( $file ) ) {
+			return '';
+		}
+		return $file;
+	}
+
+	/**
 	 * Finalize an import session: resolve all hierarchical parent-child relationships,
 	 * clean up temporary files, and return final summary.
 	 *
@@ -778,16 +836,19 @@ class Data_Shifter_Importer {
 	 * @return array|WP_Error Final metrics.
 	 */
 	public static function finalize_session( $session_id ) {
-		$upload_dir   = wp_upload_dir();
-		$session_file = trailingslashit( $upload_dir['basedir'] ) . 'data-shifter/temp/' . preg_replace( '/[^a-zA-Z0-9_-]/', '', $session_id ) . '.json';
+		$session_file = self::get_session_file( $session_id );
 
-		if ( ! file_exists( $session_file ) ) {
+		if ( ! $session_file || ! file_exists( $session_file ) ) {
 			return new WP_Error( 'session_not_found', __( 'Session file not found.', 'data-shifter' ) );
 		}
 
 		$content = file_get_contents( $session_file );
 		$session = json_decode( $content, true );
 		unset( $content );
+
+		if ( is_array( $session ) && ( ! isset( $session['user_id'] ) || get_current_user_id() !== (int) $session['user_id'] ) ) {
+			return new WP_Error( 'session_forbidden', __( 'This import session belongs to another user.', 'data-shifter' ) );
+		}
 
 		if ( is_array( $session ) ) {
 			$importer_instance               = new self( $session['file_path'], $session['format'] );
@@ -838,6 +899,17 @@ class Data_Shifter_Importer {
 			return @unserialize( trim( $value ), array( 'allowed_classes' => false ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize -- Objects are disabled.
 		}
 		return $value;
+	}
+
+	/**
+	 * Remove the folder that a ZIP package was extracted to, if any.
+	 *
+	 * @return void
+	 */
+	public function cleanup_extracted() {
+		if ( '' !== $this->extracted_dir && is_dir( $this->extracted_dir ) ) {
+			self::delete_dir_recursive( $this->extracted_dir );
+		}
 	}
 
 	/**
@@ -1003,9 +1075,9 @@ class Data_Shifter_Importer {
 			$f_oldid = ! empty( $item['featured_image']['id'] ) ? (int) $item['featured_image']['id'] : 0;
 
 			// Handle ZIP extracted media file if available.
-			if ( empty( $f_base ) && ! empty( $item['featured_image']['zip_path'] ) && ! empty( $item['_extracted_dir'] ) ) {
-				$zip_fpath = path_join( $item['_extracted_dir'], $item['featured_image']['zip_path'] );
-				if ( file_exists( $zip_fpath ) ) {
+			if ( empty( $f_base ) && ! empty( $item['featured_image']['zip_path'] ) ) {
+				$zip_fpath = $this->get_zip_media_path( $item['featured_image']['zip_path'] );
+				if ( $zip_fpath ) {
 					$bin = @file_get_contents( $zip_fpath ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Missing files are handled by the caller.
 					if ( false !== $bin ) {
 						$f_base = base64_encode( $bin ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Bundles image bytes inside export packages.
@@ -1020,7 +1092,7 @@ class Data_Shifter_Importer {
 				'description' => $item['featured_image']['description'] ?? '',
 			);
 
-			$attach_id = Data_Shifter_Media::import_from_url( $f_url, $post_id, $f_base, $extra );
+			$attach_id = Codixr_Data_Shifter_Media::import_from_url( $f_url, $post_id, $f_base, $extra );
 			if ( ! is_wp_error( $attach_id ) && $attach_id > 0 ) {
 				set_post_thumbnail( $post_id, $attach_id );
 				$new_feat_url = wp_get_attachment_url( $attach_id );
@@ -1044,9 +1116,9 @@ class Data_Shifter_Importer {
 					continue;
 				}
 
-				if ( empty( $g_base ) && ! empty( $gallery_item['zip_path'] ) && ! empty( $item['_extracted_dir'] ) ) {
-					$zip_gpath = path_join( $item['_extracted_dir'], $gallery_item['zip_path'] );
-					if ( file_exists( $zip_gpath ) ) {
+				if ( empty( $g_base ) && ! empty( $gallery_item['zip_path'] ) ) {
+					$zip_gpath = $this->get_zip_media_path( $gallery_item['zip_path'] );
+					if ( $zip_gpath ) {
 						$bin = @file_get_contents( $zip_gpath ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Missing files are handled by the caller.
 						if ( false !== $bin ) {
 							$g_base = base64_encode( $bin ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Bundles image bytes inside export packages.
@@ -1061,7 +1133,7 @@ class Data_Shifter_Importer {
 					'description' => $gallery_item['description'] ?? '',
 				);
 
-				$g_attach_id = Data_Shifter_Media::import_from_url( $g_url, $post_id, $g_base, $extra );
+				$g_attach_id = Codixr_Data_Shifter_Media::import_from_url( $g_url, $post_id, $g_base, $extra );
 				if ( ! is_wp_error( $g_attach_id ) && $g_attach_id > 0 ) {
 					$new_g_url = wp_get_attachment_url( $g_attach_id );
 					if ( $new_g_url ) {
@@ -1175,7 +1247,7 @@ class Data_Shifter_Importer {
 			}
 
 			// Recursively transform any image URLs, attachment IDs, or serialized ACF structures.
-			$transformed_value = Data_Shifter_Media::replace_meta_urls_and_ids(
+			$transformed_value = Codixr_Data_Shifter_Media::replace_meta_urls_and_ids(
 				$value,
 				$media_url_map,
 				$media_id_map,

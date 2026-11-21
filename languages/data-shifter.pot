@@ -9,22 +9,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-16T09:16:25+00:00\n"
+"POT-Creation-Date: 2026-11-21T12:55:10+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: data-shifter\n"
 
 #. Plugin Name of the plugin
 #: data-shifter.php
-#: includes/class-data-shifter-admin.php:43
-#: includes/class-data-shifter-admin.php:44
+#: includes/class-codixr-data-shifter-admin.php:43
+#: includes/class-codixr-data-shifter-admin.php:44
 msgid "Data Shifter"
-msgstr ""
-
-#. Plugin URI of the plugin
-#. Author URI of the plugin
-#: data-shifter.php
-msgid "https://codixr.com"
 msgstr ""
 
 #. Description of the plugin
@@ -37,311 +31,335 @@ msgstr ""
 msgid "Codixr"
 msgstr ""
 
+#. Author URI of the plugin
+#: data-shifter.php
+msgid "https://codixr.com"
+msgstr ""
+
 #. translators: %s: required PHP version
-#: data-shifter.php:34
+#: data-shifter.php:38
 #, php-format
 msgid "Data Shifter requires PHP %s or higher. Please update your PHP version."
 msgstr ""
 
 #. translators: %s: required WordPress version
-#: data-shifter.php:55
+#: data-shifter.php:64
 #, php-format
 msgid "Data Shifter requires WordPress %s or higher. Please update WordPress."
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:54
-#: includes/class-data-shifter-admin.php:55
+#: includes/class-codixr-data-shifter-admin.php:54
+#: includes/class-codixr-data-shifter-admin.php:55
 #: views/export-page.php:40
 #: views/partials/header.php:17
 msgid "Export"
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:63
-#: includes/class-data-shifter-admin.php:64
+#: includes/class-codixr-data-shifter-admin.php:63
+#: includes/class-codixr-data-shifter-admin.php:64
 #: views/partials/header.php:22
 msgid "Import"
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:104
+#: includes/class-codixr-data-shifter-admin.php:105
 msgid "Export completed successfully."
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:105
+#: includes/class-codixr-data-shifter-admin.php:106
 msgid "An error occurred during export."
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:106
+#: includes/class-codixr-data-shifter-admin.php:107
 msgid "Import completed successfully."
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:107
+#: includes/class-codixr-data-shifter-admin.php:108
 msgid "An error occurred during import."
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:108
+#: includes/class-codixr-data-shifter-admin.php:109
 msgid "Are you sure you want to run this import? This action cannot be undone."
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:109
+#: includes/class-codixr-data-shifter-admin.php:110
 msgid "Processing…"
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:110
+#: includes/class-codixr-data-shifter-admin.php:111
 msgid "Downloading…"
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:111
+#: includes/class-codixr-data-shifter-admin.php:112
 msgid "Uploading…"
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:124
-#: includes/class-data-shifter-admin.php:136
+#: includes/class-codixr-data-shifter-admin.php:125
+#: includes/class-codixr-data-shifter-admin.php:137
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #. translators: 1: Codixr website link, 2: support email link
-#: includes/class-data-shifter-admin.php:154
+#: includes/class-codixr-data-shifter-admin.php:155
 #, php-format
 msgid "Data Shifter is built by %1$s, a software agency. Need help? Email %2$s."
 msgstr ""
 
-#: includes/class-data-shifter-admin.php:170
+#: includes/class-codixr-data-shifter-admin.php:171
 msgid "Open Data Shifter"
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:67
-#: includes/class-data-shifter-ajax.php:491
+#: includes/class-codixr-data-shifter-ajax.php:68
+#: includes/class-codixr-data-shifter-ajax.php:489
 msgid "Security check failed."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:70
+#: includes/class-codixr-data-shifter-ajax.php:71
 msgid "You do not have permission to perform this action."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:309
-#: includes/class-data-shifter-ajax.php:358
+#: includes/class-codixr-data-shifter-ajax.php:306
+#: includes/class-codixr-data-shifter-ajax.php:355
 msgid "Invalid post type."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:459
+#: includes/class-codixr-data-shifter-ajax.php:457
 msgid "Failed to write export file."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:494
+#: includes/class-codixr-data-shifter-ajax.php:492
 msgid "Permission denied."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:499
+#: includes/class-codixr-data-shifter-ajax.php:497
 msgid "No file specified."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:504
+#: includes/class-codixr-data-shifter-ajax.php:502
 msgid "Invalid file path or file not found."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:556
-#: includes/class-data-shifter-ajax.php:566
+#: includes/class-codixr-data-shifter-ajax.php:555
+#: includes/class-codixr-data-shifter-ajax.php:565
 msgid "No file was uploaded."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:563
+#: includes/class-codixr-data-shifter-ajax.php:562
 msgid "File exceeds server upload size limit."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:564
+#: includes/class-codixr-data-shifter-ajax.php:563
 msgid "File exceeds form upload size limit."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:565
+#: includes/class-codixr-data-shifter-ajax.php:564
 msgid "File was only partially uploaded."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:567
+#: includes/class-codixr-data-shifter-ajax.php:566
 msgid "Server missing temporary folder."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:568
+#: includes/class-codixr-data-shifter-ajax.php:567
 msgid "Failed to write file to disk."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:569
+#: includes/class-codixr-data-shifter-ajax.php:568
 msgid "A PHP extension stopped the upload."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:571
+#: includes/class-codixr-data-shifter-ajax.php:570
 msgid "Unknown upload error."
 msgstr ""
 
 #. translators: %s: comma-separated list of file extensions
-#: includes/class-data-shifter-ajax.php:584
+#: includes/class-codixr-data-shifter-ajax.php:585
 #, php-format
 msgid "Invalid file type. Allowed types: %s"
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:597
+#: includes/class-codixr-data-shifter-ajax.php:599
 msgid "Failed to move uploaded file."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:649
+#: includes/class-codixr-data-shifter-ajax.php:647
 msgid "Invalid chunk upload parameters."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:655
+#: includes/class-codixr-data-shifter-ajax.php:650
 msgid "Invalid file extension."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:659
+#: includes/class-codixr-data-shifter-ajax.php:690
+msgid "Upload session not found or expired. Please choose the file again."
+msgstr ""
+
+#: includes/class-codixr-data-shifter-ajax.php:702
+msgid "Upload chunks arrived out of order. Please choose the file again."
+msgstr ""
+
+#: includes/class-codixr-data-shifter-ajax.php:709
 msgid "Chunk upload failed on server."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:670
+#: includes/class-codixr-data-shifter-ajax.php:720
 msgid "Failed to read uploaded chunk."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:676
+#: includes/class-codixr-data-shifter-ajax.php:726
 msgid "Failed to write chunk to temporary storage."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:704
+#: includes/class-codixr-data-shifter-ajax.php:758
 msgid "Failed to assemble uploaded chunks."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:759
-#: includes/class-data-shifter-ajax.php:903
+#: includes/class-codixr-data-shifter-ajax.php:813
+#: includes/class-codixr-data-shifter-ajax.php:957
 msgid "Missing file or format."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:764
+#: includes/class-codixr-data-shifter-ajax.php:818
 msgid "Import file not found or path invalid."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:832
-#: includes/class-data-shifter-ajax.php:869
+#: includes/class-codixr-data-shifter-ajax.php:886
+#: includes/class-codixr-data-shifter-ajax.php:923
 msgid "Missing session ID."
 msgstr ""
 
-#: includes/class-data-shifter-ajax.php:908
-#: includes/class-data-shifter-importer.php:154
+#: includes/class-codixr-data-shifter-ajax.php:962
+#: includes/class-codixr-data-shifter-importer.php:154
 msgid "Import file not found."
 msgstr ""
 
 #. translators: %s: post type name
-#: includes/class-data-shifter-exporter.php:115
+#: includes/class-codixr-data-shifter-exporter.php:115
 #, php-format
 msgid "Post type \"%s\" does not exist."
 msgstr ""
 
-#: includes/class-data-shifter-exporter.php:282
+#: includes/class-codixr-data-shifter-exporter.php:282
 msgid "ZipArchive is not enabled on this server PHP environment."
 msgstr ""
 
-#: includes/class-data-shifter-exporter.php:288
+#: includes/class-codixr-data-shifter-exporter.php:288
 msgid "Could not create ZIP package file on disk."
 msgstr ""
 
-#: includes/class-data-shifter-exporter.php:357
+#: includes/class-codixr-data-shifter-exporter.php:362
 msgid "Cannot open file for writing."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:171
+#. translators: %s: file name inside the ZIP package
+#: includes/class-codixr-data-shifter-files.php:195
+#, php-format
+msgid "The ZIP package contains a file that is not allowed: %s. Only data.json and media files in the media folder can be imported."
+msgstr ""
+
+#: includes/class-codixr-data-shifter-importer.php:171
 msgid "Unsupported file format."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:182
+#: includes/class-codixr-data-shifter-importer.php:182
 msgid "ZipArchive is not enabled on this server."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:194
+#: includes/class-codixr-data-shifter-importer.php:189
 msgid "Could not open ZIP package."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:204
+#: includes/class-codixr-data-shifter-importer.php:231
 msgid "The ZIP package does not contain data.json."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:212
+#: includes/class-codixr-data-shifter-importer.php:239
 msgid "The data.json inside the ZIP package is invalid."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:240
+#: includes/class-codixr-data-shifter-importer.php:263
 msgid "The JSON file is empty."
 msgstr ""
 
 #. translators: %s: JSON parser error message
-#: includes/class-data-shifter-importer.php:256
+#: includes/class-codixr-data-shifter-importer.php:279
 #, php-format
 msgid "Invalid JSON format: %s"
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:294
+#: includes/class-codixr-data-shifter-importer.php:317
 msgid "Cannot open CSV file."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:306
+#: includes/class-codixr-data-shifter-importer.php:329
 msgid "CSV header row is missing or invalid."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:413
+#: includes/class-codixr-data-shifter-importer.php:437
 msgid "SimpleXML PHP extension is required to import XML files."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:418
+#: includes/class-codixr-data-shifter-importer.php:442
 msgid "Failed to parse XML file."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:680
+#: includes/class-codixr-data-shifter-importer.php:699
 msgid "Import session expired or not found. Please upload again."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:688
+#: includes/class-codixr-data-shifter-importer.php:707
 msgid "Corrupted session data."
 msgstr ""
 
+#: includes/class-codixr-data-shifter-importer.php:710
+#: includes/class-codixr-data-shifter-importer.php:850
+msgid "This import session belongs to another user."
+msgstr ""
+
 #. translators: 1: item number, 2: item title, 3: error message
-#: includes/class-data-shifter-importer.php:728
+#: includes/class-codixr-data-shifter-importer.php:750
 #, php-format
 msgid "Item #%1$d (%2$s): %3$s"
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:785
+#: includes/class-codixr-data-shifter-importer.php:842
 msgid "Session file not found."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:823
+#: includes/class-codixr-data-shifter-importer.php:884
 msgid "Could not finalize session."
 msgstr ""
 
-#: includes/class-data-shifter-importer.php:913
+#: includes/class-codixr-data-shifter-importer.php:985
 msgid "Item has neither title nor content."
 msgstr ""
 
-#: includes/class-data-shifter-media.php:53
+#: includes/class-codixr-data-shifter-media.php:53
 msgid "Invalid URL provided for media import."
 msgstr ""
 
 #. translators: %s: host name
-#: includes/class-data-shifter-media.php:102
+#: includes/class-codixr-data-shifter-media.php:91
 #, php-format
 msgid "Local host %s cannot be reached from this server without bundled image data."
 msgstr ""
 
 #. translators: 1: URL, 2: error message
-#: includes/class-data-shifter-media.php:124
+#: includes/class-codixr-data-shifter-media.php:113
 #, php-format
 msgid "Failed to download media from %1$s: %2$s"
 msgstr ""
 
 #. translators: 1: URL, 2: HTTP status code
-#: includes/class-data-shifter-media.php:137
+#: includes/class-codixr-data-shifter-media.php:126
 #, php-format
 msgid "HTTP error %2$d when downloading %1$s."
 msgstr ""
 
-#: includes/class-data-shifter-media.php:146
+#: includes/class-codixr-data-shifter-media.php:135
 msgid "Downloaded file is empty."
 msgstr ""
 
-#: includes/class-data-shifter-media.php:217
+#: includes/class-codixr-data-shifter-media.php:202
 msgid "Could not determine file type."
 msgstr ""
 

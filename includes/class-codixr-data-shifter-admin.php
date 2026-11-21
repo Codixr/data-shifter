@@ -4,7 +4,7 @@
  *
  * Handles admin menus, page rendering, and asset enqueueing.
  *
- * @package Data_Shifter
+ * @package Codixr_Data_Shifter
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -12,9 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class Data_Shifter_Admin
+ * Class Codixr_Data_Shifter_Admin
  */
-class Data_Shifter_Admin {
+class Codixr_Data_Shifter_Admin {
 
 	/**
 	 * Array of plugin page hook suffixes used for conditional asset loading.
@@ -29,7 +29,7 @@ class Data_Shifter_Admin {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'register_menus' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
-		add_filter( 'plugin_action_links_' . plugin_basename( DATA_SHIFTER_PATH . 'data-shifter.php' ), array( $this, 'add_plugin_action_links' ) );
+		add_filter( 'plugin_action_links_' . plugin_basename( CODIXR_DATA_SHIFTER_PATH . 'data-shifter.php' ), array( $this, 'add_plugin_action_links' ) );
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_text' ) );
 	}
 
@@ -81,25 +81,25 @@ class Data_Shifter_Admin {
 
 		wp_enqueue_style(
 			'data-shifter-admin',
-			DATA_SHIFTER_URL . 'assets/css/admin.css',
+			CODIXR_DATA_SHIFTER_URL . 'assets/css/admin.css',
 			array(),
-			DATA_SHIFTER_VERSION
+			CODIXR_DATA_SHIFTER_VERSION
 		);
 
 		wp_enqueue_script(
 			'data-shifter-admin',
-			DATA_SHIFTER_URL . 'assets/js/admin.js',
+			CODIXR_DATA_SHIFTER_URL . 'assets/js/admin.js',
 			array( 'jquery' ),
-			DATA_SHIFTER_VERSION,
+			CODIXR_DATA_SHIFTER_VERSION,
 			true
 		);
 
 		wp_localize_script(
 			'data-shifter-admin',
-			'data_shifter_ajax',
+			'codixr_data_shifter_ajax',
 			array(
 				'ajax_url'   => admin_url( 'admin-ajax.php' ),
-				'nonce'      => wp_create_nonce( 'data_shifter_nonce' ),
+				'nonce'      => wp_create_nonce( 'codixr_data_shifter_nonce' ),
 				'chunk_size' => $this->get_chunk_size(),
 				'strings'    => array(
 					'export_success' => __( 'Export completed successfully.', 'data-shifter' ),
@@ -124,7 +124,7 @@ class Data_Shifter_Admin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'data-shifter' ) );
 		}
-		include DATA_SHIFTER_VIEWS . 'export-page.php';
+		include CODIXR_DATA_SHIFTER_VIEWS . 'export-page.php';
 	}
 
 	/**
@@ -136,7 +136,7 @@ class Data_Shifter_Admin {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'data-shifter' ) );
 		}
-		include DATA_SHIFTER_VIEWS . 'import-page.php';
+		include CODIXR_DATA_SHIFTER_VIEWS . 'import-page.php';
 	}
 
 	/**

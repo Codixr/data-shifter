@@ -5,7 +5,7 @@
  * Handles exporting WordPress posts to JSON, CSV, and XML formats
  * with support for meta, taxonomies, media, and comments.
  *
- * @package Data_Shifter
+ * @package Codixr_Data_Shifter
  * @since   1.0.0
  */
 
@@ -37,13 +37,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 /**
- * Class Data_Shifter_Exporter
+ * Class Codixr_Data_Shifter_Exporter
  *
  * Builds queries from export configuration and formats results for export.
  *
  * @since 1.0.0
  */
-class Data_Shifter_Exporter {
+class Codixr_Data_Shifter_Exporter {
 
 	/**
 	 * Export configuration array.
@@ -221,7 +221,7 @@ class Data_Shifter_Exporter {
 	 * @return string Formatted export data (JSON, CSV, or XML string).
 	 */
 	public function export() {
-		$temp_file = wp_tempnam( 'data_shifter_exp_' );
+		$temp_file = wp_tempnam( 'codixr_data_shifter_exp_' );
 		$res       = $this->export_to_file( $temp_file );
 
 		if ( is_wp_error( $res ) ) {
@@ -301,8 +301,11 @@ class Data_Shifter_Exporter {
 				if ( ! empty( $item['featured_image']['data'] ) ) {
 					$bin   = base64_decode( $item['featured_image']['data'] ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Bundles image bytes inside export packages.
 					$fname = sanitize_file_name( $item['featured_image']['filename'] ?? ( 'feat_' . $item['post_data']['ID'] . '.png' ) );
-					$zip->addFromString( 'media/' . $fname, $bin );
-					$item['featured_image']['zip_path'] = 'media/' . $fname;
+					// Only media types go into the package; other files are imported from their URL instead.
+					if ( Codixr_Data_Shifter_Files::is_media_filename( $fname ) ) {
+						$zip->addFromString( 'media/' . $fname, $bin );
+						$item['featured_image']['zip_path'] = 'media/' . $fname;
+					}
 					unset( $item['featured_image']['data'] );
 				}
 
@@ -312,8 +315,10 @@ class Data_Shifter_Exporter {
 						if ( ! empty( $m_item['data'] ) ) {
 							$bin   = base64_decode( $m_item['data'] ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions -- Bundles image bytes inside export packages.
 							$fname = sanitize_file_name( $m_item['filename'] ?? ( 'img_' . $media_idx . '.png' ) );
-							$zip->addFromString( 'media/' . $fname, $bin );
-							$item['media_gallery'][ $k ]['zip_path'] = 'media/' . $fname;
+							if ( Codixr_Data_Shifter_Files::is_media_filename( $fname ) ) {
+								$zip->addFromString( 'media/' . $fname, $bin );
+								$item['media_gallery'][ $k ]['zip_path'] = 'media/' . $fname;
+							}
 							unset( $item['media_gallery'][ $k ]['data'] );
 							++$media_idx;
 						}
@@ -533,10 +538,10 @@ class Data_Shifter_Exporter {
 
 		// Media.
 		if ( $this->config['include_media'] ) {
-			$item['featured_image'] = Data_Shifter_Media::get_featured_image_data( $post->ID );
+			$item['featured_image'] = Codixr_Data_Shifter_Media::get_featured_image_data( $post->ID );
 			$include_gallery        = ! empty( $this->config['include_gallery'] );
 			$post_meta_for_media    = isset( $item['meta'] ) ? $item['meta'] : array();
-			$item['media_gallery']  = Data_Shifter_Media::get_post_media( $post, $include_gallery, $post_meta_for_media );
+			$item['media_gallery']  = Codixr_Data_Shifter_Media::get_post_media( $post, $include_gallery, $post_meta_for_media );
 		}
 
 		// Comments.
@@ -697,7 +702,7 @@ class Data_Shifter_Exporter {
 
 		global $wpdb;
 
-		$cache_key = 'data_shifter_meta_keys_' . sanitize_key( $post_type );
+		$cache_key = 'codixr_data_shifter_meta_keys_' . sanitize_key( $post_type );
 		$cached    = wp_cache_get( $cache_key, 'data-shifter' );
 
 		if ( false !== $cached ) {
@@ -806,7 +811,7 @@ class Data_Shifter_Exporter {
 		fwrite( $handle, "\xEF\xBB\xBF" );
 
 		// Write header row.
-		fputcsv( $handle, $headers );
+		fputcsv( $handle, array_map( array( 'Codixr_Data_Shifter_Files', 'csv_safe_cell' ), $headers ) );
 
 		// Write data rows.
 		foreach ( $flat_rows as $row ) {
@@ -819,7 +824,8 @@ class Data_Shifter_Exporter {
 					$value = wp_json_encode( $value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 				}
 
-				$csv_row[] = $value;
+				// Neutralize spreadsheet formulas (=, +, -, @, tab, CR).
+				$csv_row[] = Codixr_Data_Shifter_Files::csv_safe_cell( $value );
 			}
 			fputcsv( $handle, $csv_row );
 		}

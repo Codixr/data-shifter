@@ -4,7 +4,7 @@
  *
  * Single-page drag-and-drop workflow for importing data into WordPress.
  *
- * @package Data_Shifter
+ * @package Codixr_Data_Shifter
  * @since   1.0.0
  */
 
@@ -14,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="wrap data-shifter-wrap">
 	<?php
-	$data_shifter_current_tab = 'import';
-	require DATA_SHIFTER_VIEWS . 'partials/header.php';
+	$codixr_data_shifter_current_tab = 'import';
+	require CODIXR_DATA_SHIFTER_VIEWS . 'partials/header.php';
 	?>
 
 	<!-- Step 1: Upload Area -->
